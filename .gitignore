@@ -13,3 +13,7 @@ logs/
 .github
 .pytest_cache
 .chainlit
+
+pyrefly.toml
+
+/filings/

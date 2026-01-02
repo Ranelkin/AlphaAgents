@@ -1,6 +1,6 @@
 from fastmcp import FastMCP
 from ....util.log_config import setup_logging
-from ....core.services.grouped_tools import get_available_tools
+from ...tools import TOOLS
 
 logger = setup_logging("mcp.server")
 
@@ -12,9 +12,8 @@ mcp = FastMCP(
 )
 
 try: 
-    tools = get_available_tools()
 
-    for func in tools: 
+    for func in TOOLS: 
         mcp.tool(
             func, 
             name=None, 

@@ -9,7 +9,7 @@ logger = setup_logging("mcp.session")
 class Session:
     def __init__(self):
         """Initialize the session manager with no active MCP tool."""
-        self.mcp_tool: Optional[MCPClient] = None
+        self.mcp_tool: MCPClient 
         
     def start(self):
         """Start persistent connection to the MCP server.
@@ -40,7 +40,7 @@ class Session:
         tool_name = tool_func.__name__
         sig = inspect.signature(tool_func)
         params = list(sig.parameters.keys())
-        
+        assert self.mcp_tool != None
        
         if len(params) == 1:
             def wrapper(arg=None, **kwargs):
@@ -83,15 +83,12 @@ class Session:
         if not self.mcp_tool:
             raise RuntimeError("MCP session not started. Call start() first.")
         
-        from ....core.services.grouped_tools import get_available_tools
-        
-        # Get all available tools from the centralized registry
-        available_tools = get_available_tools()
+        from src.infrastructure.tools import TOOLS
         
         langchain_tools = []
         
         # Dynamically create LangChain Tool objects for each registered tool
-        for tool_func in available_tools:
+        for tool_func in TOOLS:
             tool_name = tool_func.__name__
             tool_description = tool_func.__doc__ or f"Tool: {tool_name}"
             

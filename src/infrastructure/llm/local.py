@@ -145,7 +145,7 @@ class AutoLLM(BaseChatModel):
                 self.pipe = pipeline(
                     "text-generation",
                     model=model_id,
-                    model_kwargs=minimal_kwargs
+                    model_kwargs=minimal_kwargs, 
                 )
                 print("Model loaded successfully (minimal fallback)")
         
@@ -471,7 +471,6 @@ MODEL_ID = os.environ.get("LLM_MODEL_ID", "openai/gpt-oss-20b")
 USE_8BIT = os.environ.get("USE_8BIT", "false").lower() == "true"
 USE_4BIT = os.environ.get("USE_4BIT", "false").lower() == "true"
 
-print("Initializing default local LLM instance...")
 
 
 # Example usage

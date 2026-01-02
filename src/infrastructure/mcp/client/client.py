@@ -59,7 +59,8 @@ class MCPClient:
             self.connect()
         async def _call():
             """Call a tool asynchronously and format the result as a JSON string."""
+            assert self.session
             result = await self.session.call_tool(tool_name, arguments=args)
             return json.dumps(result, indent=2) if isinstance(result, dict) else str(result)
-            
+        assert self.loop
         return self.loop.run_until_complete(_call())

@@ -1,12 +1,12 @@
-from .session import Session
+from .session_manager import Session
 from typing import Optional
 
 class Context:
-    """Global singleton wrapper for MCPSessionManager"""
+    """Global singleton wrapper for Session"""
     _instance: Optional[Session] = None
     
     @classmethod
-    def get_instance(cls) -> MCPSessionManager:
+    def get_instance(cls) -> Session:
         """Get or create the global MCP manager instance"""
         if cls._instance is None:
             cls._instance = Session()
@@ -21,7 +21,7 @@ class Context:
             cls._instance = None
 
 
-def get_mcp_manager() -> MCPSessionManager:
+def get_mcp_manager() -> Session:
     """Get the global MCP manager"""
     return Context.get_instance()
 

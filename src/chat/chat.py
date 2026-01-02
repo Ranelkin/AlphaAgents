@@ -56,10 +56,10 @@ def chat_interface():
     # Chat configuration
     ####################
     if "messages" not in st.session_state:
-    st.session_state.messages = []
+        st.session_state.messages = []
     for m in st.session_state.messages:
-    with st.chat_message(m["role"]):
-        st.markdown(m["content"])
+        with st.chat_message(m["role"]):
+            st.markdown(m["content"])
     
     if prompt := st.chat_input("What would you like to do?"):
         st.session_state.messages.append({"role": "user", "content": prompt})
@@ -67,10 +67,10 @@ def chat_interface():
             st.markdown(prompt)
             
         with st.chat_message("assistant"):
-        answer_ph = st.empty()
-        input_data = {"messages": [{"role": "user", "content": prompt}]}
-        final_answer = ""
-        
+            answer_ph = st.empty()
+            input_data = {"messages": [{"role": "user", "content": prompt}]}
+            final_answer = ""
+            
         try:
             step_container = st.container()
             
