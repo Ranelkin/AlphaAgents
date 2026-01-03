@@ -7,6 +7,7 @@ import inspect
 logger = setup_logging("mcp.session")
 
 class Session:
+    
     def __init__(self):
         """Initialize the session manager with no active MCP tool."""
         self.mcp_tool: MCPClient 
