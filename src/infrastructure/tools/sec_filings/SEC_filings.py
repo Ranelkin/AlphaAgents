@@ -10,8 +10,12 @@ EMAIL = os.environ.get('EMAIL')
 COMPANY = os.environ.get('COMPANY')
 assert EMAIL
 
-logger.info(f'Set email: {EMAIL}')
+
 set_identity(EMAIL)
+logger.info(f'Set email: {EMAIL}')
+
+_tenk_repl: dict[str, PythonREPL] = {}
+_tenq_repl: dict[str, PythonREPL]= {} 
 
 def create_tenk_filing_repl(ticker: str): 
     company = Company(ticker)
@@ -27,18 +31,14 @@ def create_tenk_filing_repl(ticker: str):
         "type": type,       
        
     }  
-    repl = PythonREPL(globals=restricted_env, locals=restricted_env)
 
     description = """This a python shell equiped with the edgar company 10-K Filing.
     Use this to explore the filing. Start with: print(filing.to_context()).
     You can use dir(filing), help(filing.obj), etc. to discover available methods."""    
     
-    return Tool(
-        name="python_10_K_repl",
-        description=description,
-        func=repl.run,
-    )
-   
+    _tenk_repl[ticker] = PythonREPL(globals=restricted_env, locals=restricted_env)
+    logger.info('Registered 10K Repl')
+    
 def create_tenq_filing_repl(ticker: str): 
     company = Company(ticker)
     assert company.is_company, f"No company found for {ticker}"
@@ -53,16 +53,33 @@ def create_tenq_filing_repl(ticker: str):
         "type": type,       
        
     }  
-    repl =  PythonREPL(globals=restricted_env, locals=restricted_env)
     
     description = """This a python shell equiped with the edgar company 10-Q Filing.
     Use this to explore the filing. Start with: print(filing.to_context()).
     You can use dir(filing), help(filing.obj), etc. to discover available methods."""    
     
-    return Tool(
-        name="python_10_Q_repl",
-        description=description,
-        func=repl.run,
-    )
+    _tenq_repl[ticker] = PythonREPL(globals=restricted_env, locals=restricted_env)
+    logger.info('Registered 10Q Repl')
     
 
+def query_tenk_filing(ticker: str, query: str):
+    """Query a 10-K filing with Python code.
+    
+    Args:
+        ticker: Stock ticker (e.g., 'AAPL')
+        query: Python code to execute (e.g., 'print(filing.to_context())')
+    """
+    repl = _tenk_repl[ticker]
+    assert isinstance(repl, PythonREPL), logger.info('Python REPL not set')
+    return repl.run(query)
+
+def query_tenq_filing(ticker: str, query: str):
+    """Query a 10-Q filing with Python code.
+    
+    Args:
+        ticker: Stock ticker (e.g., 'AAPL')
+        query: Python code to execute (e.g., 'print(filing.to_context())')
+    """
+    repl = _tenq_repl[ticker]
+    assert isinstance(repl, PythonREPL), logger.info('Python REPL not set')
+    return repl.run(query)

@@ -10,7 +10,9 @@ def fundamental_agent_node(state: ConversationState) -> ConversationState:
     logger.info('Fundamental agent invoked')
     
     session = get_mcp_manager()
+    allowed_tool_names = ['query_tenk_filing', 'query_tenq_filing']
     tools = session.get_tools()
+    tools = [t for t in tools if t.name in allowed_tool_names]
     tool_names = ", ".join([t.name for t in tools])
     
     ticker = state.get('ticker')
@@ -44,7 +46,7 @@ def fundamental_agent_node(state: ConversationState) -> ConversationState:
     agent_graph = create_react_agent(
         llm, 
         tools,
-        state_modifier=system_prompt
+        prompt=system_prompt
     )
     
     if fundamental_analysis == '': 
@@ -62,11 +64,19 @@ def fundamental_agent_node(state: ConversationState) -> ConversationState:
         sentinemnt agent analysis: {sentiment_analysis}"""
             
     try:
-        result = agent_graph.invoke(
+        messages_accumulator = []
+        
+        for event in agent_graph.stream(
             {"messages": [{"role": "user", "content": input_text}]},
-            {"recursion_limit": 5}
-        )
-        output = result["messages"][-1].content
+            {"recursion_limit": 15},
+            stream_mode="values" 
+        ):
+            logger.info(f"Agent step: {event}")
+            if "messages" in event:
+                messages_accumulator = event["messages"]
+        
+        output = messages_accumulator[-1].content if messages_accumulator else "No output"
+        
     except Exception as e:
         logger.error(f"Agent execution failed: {e}")
         output = f"Analysis incomplete due to error: {e}"
