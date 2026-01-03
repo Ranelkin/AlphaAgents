@@ -12,7 +12,7 @@ class MCPClient:
         self.server_command = server_command
         self.mcp_server = StdioServerParameters(
             command="python3",
-            args=["-m", "src.infrastructure.mcp.server.mcp_server"],
+            args=["-m", "src.infrastructure.mcp.server.server"],
             env=None  
         )
         self.session: Optional[ClientSession] = None

@@ -64,7 +64,7 @@ def fundamental_agent_node(state: ConversationState) -> ConversationState:
     try:
         result = agent_graph.invoke(
             {"messages": [{"role": "user", "content": input_text}]},
-            {"recursion_limit": 30}
+            {"recursion_limit": 5}
         )
         output = result["messages"][-1].content
     except Exception as e:
@@ -74,4 +74,5 @@ def fundamental_agent_node(state: ConversationState) -> ConversationState:
     state['fundamental_analysis'] = output
     state['discussion_round'] = state.get('discussion_round', 0) + 1
     state['next_agent'] = 'technical_agent'
+    state['messages'] = [{"role": "assistant", "content": output}] #Truncate messages 
     return state
