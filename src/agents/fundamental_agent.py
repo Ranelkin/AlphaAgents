@@ -1,11 +1,24 @@
 from langgraph.prebuilt import create_react_agent
 from langchain.tools import Tool
+from langchain_core.messages.utils import trim_messages
+
 from src.types import ConversationState
 from src.infrastructure.llm import llm 
 from src.util.log_config import setup_logging
 from src.infrastructure.tools import  create_tenk_filing_repl, create_tenq_filing_repl
 
 logger = setup_logging('Fundamental Agent')
+
+def pre_model_hook(state):
+    trimmed = trim_messages(
+        state["messages"],
+        strategy="last",
+        max_tokens=10000,  # Adjust based on model limit
+        token_counter=llm.get_num_tokens_from_messages,
+        start_on="human",
+        end_on=("human", "tool")
+    )
+    return {"llm_input_messages": trimmed}
 
 def fundamental_agent_node(state: ConversationState) -> ConversationState:
     logger.info('Fundamental agent invoked')
@@ -46,28 +59,29 @@ def fundamental_agent_node(state: ConversationState) -> ConversationState:
         will return relevant text snippets
         and data points from the 10K document. Keep checking if you
         have answered the users question to avoid looping.
+        
         After gathering key sections (Business, Risk Factors, MD&A, Financial Statements), stop tool use and provide the full fundamental analysis.
         You have access to Python REPL tools with pre-loaded SEC filing objects.
-    
         START by running: print(filing.to_context())
         Then use methods that are listed to navigate the filing. 
-        DO NOT try to fetch data from SEC.gov URLs - the filing is already loaded.
+        DO NOT provide qualitative speculation - extract actual data from the filing.
+        DO NOT ask the user if they want you to proceed - just do the analysis.
 
         Available tools: {tool_names}
         Company: {ticker}
 
-        Use the ReAct format:
-        Question: the input question you must answer
-        Thought: you should always think about what to do
-        Action: the action to take, should be one of [{tool_names}]
-        Action Input: Python code to execute (e.g., "print(filing.to_context())")
-        Observation: the result of the action
+        Your final analysis MUST include:
+        - Revenue trend (3 years with % growth)
+        - Net income and margins
+        - BUY/SELL + conviction score
         ..."""
-        
+    
+    
     agent_graph = create_react_agent(
         llm, 
         tools,
-        prompt=system_prompt
+        prompt=system_prompt,
+        pre_model_hook=pre_model_hook
     )
     
     if fundamental_analysis == '': 
@@ -85,18 +99,18 @@ def fundamental_agent_node(state: ConversationState) -> ConversationState:
         sentinemnt agent analysis: {sentiment_analysis}"""
             
     try:
-        messages_accumulator = []
+        final_messages = None 
         
         for event in agent_graph.stream(
             {"messages": [{"role": "user", "content": input_text}]},
-            {"recursion_limit": 50},
+            {"recursion_limit": 75},
             stream_mode="values" 
         ):
             logger.info(f"Agent step: {event}")
             if "messages" in event:
-                messages_accumulator = event["messages"]
+                final_messages = event["messages"]
         
-        output = messages_accumulator[-1].content if messages_accumulator else "No output"
+        output = final_messages[-1].content if final_messages else "No output"
         
     except Exception as e:
         logger.error(f"Agent execution failed: {e}")
