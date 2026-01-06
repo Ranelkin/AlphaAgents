@@ -3,8 +3,7 @@ from langchain.tools import Tool
 from src.types import ConversationState
 from src.infrastructure.llm import llm 
 from src.util.log_config import setup_logging
-from src.infrastructure.mcp import get_mcp_manager
-from src.infrastructure.tools import query_tenk_filing, query_tenq_filing, create_tenk_filing_repl, create_tenq_filing_repl
+from src.infrastructure.tools import  create_tenk_filing_repl, create_tenq_filing_repl
 
 logger = setup_logging('Fundamental Agent')
 

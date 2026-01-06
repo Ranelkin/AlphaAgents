@@ -1,1 +1,1 @@
-from .sec_filings import query_tenk_filing, query_tenq_filing, create_tenq_filing_repl, create_tenk_filing_repl
+from .sec_filings import create_tenq_filing_repl, create_tenk_filing_repl

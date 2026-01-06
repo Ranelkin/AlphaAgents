@@ -14,9 +14,6 @@ assert EMAIL
 set_identity(EMAIL)
 logger.info(f'Set email: {EMAIL}')
 
-_tenk_repl: dict[str, PythonREPL] = {}
-_tenq_repl: dict[str, PythonREPL]= {} 
-
 def create_tenk_filing_repl(ticker: str): 
     company = Company(ticker)
     assert company.is_company, f"No company found for {ticker}"
@@ -60,25 +57,3 @@ def create_tenq_filing_repl(ticker: str):
     repl.locals = restricted_env
     return repl 
     
-
-def query_tenk_filing(ticker: str, query: str):
-    """Query a 10-K filing with Python code.
-    
-    Args:
-        ticker: Stock ticker (e.g., 'AAPL')
-        query: Python code to execute (e.g., 'print(filing.to_context())')
-    """
-    repl = _tenk_repl[ticker]
-    assert isinstance(repl, PythonREPL), logger.info('Python REPL not set')
-    return repl.run(query)
-
-def query_tenq_filing(ticker: str, query: str):
-    """Query a 10-Q filing with Python code.
-    
-    Args:
-        ticker: Stock ticker (e.g., 'AAPL')
-        query: Python code to execute (e.g., 'print(filing.to_context())')
-    """
-    repl = _tenq_repl[ticker]
-    assert isinstance(repl, PythonREPL), logger.info('Python REPL not set')
-    return repl.run(query)
