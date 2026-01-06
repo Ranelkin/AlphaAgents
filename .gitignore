@@ -13,6 +13,7 @@ logs/
 .github
 .pytest_cache
 .chainlit
+.vscode
 
 pyrefly.toml
 

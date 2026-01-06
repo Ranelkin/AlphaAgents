@@ -1,47 +1,69 @@
 from langgraph.prebuilt import create_react_agent
+from langchain.tools import Tool
 from src.types import ConversationState
 from src.infrastructure.llm import llm 
 from src.util.log_config import setup_logging
 from src.infrastructure.mcp import get_mcp_manager
+from src.infrastructure.tools import query_tenk_filing, query_tenq_filing, create_tenk_filing_repl, create_tenq_filing_repl
 
 logger = setup_logging('Fundamental Agent')
 
 def fundamental_agent_node(state: ConversationState) -> ConversationState:
     logger.info('Fundamental agent invoked')
     
-    session = get_mcp_manager()
-    allowed_tool_names = ['query_tenk_filing', 'query_tenq_filing']
-    tools = session.get_tools()
-    tools = [t for t in tools if t.name in allowed_tool_names]
-    tool_names = ", ".join([t.name for t in tools])
-    
     ticker = state.get('ticker')
+    
+    # Initialize REPL tools
+    tenk_repl = create_tenk_filing_repl(ticker)
+    tenq_repl = create_tenq_filing_repl(ticker)
+
+    tools = [
+        Tool(
+            name="tenk_repl",
+            func=tenk_repl.run,
+            description="""Query 10-K filing with Python code. 
+            Input: Python code string. start with print(filing.to_context())"""
+        ),
+        Tool(
+            name="tenq_repl", 
+            func=tenq_repl.run,
+            description="""Query 10-Q filing with Python code. 
+            Input: Python code string. start with print(filing.to_context())"""
+        )
+    ]
+
+    tool_names = [t.name for t in tools]
     fundamental_analysis = state.get('fundamental_analysis', '')
     
     # System prompt from paper
     # The format appendix is help for the ReAct agent loop 
-    system_prompt = f"""As a fundamental financial equity
-    analyst your primary responsibility is to analyze the most
-    recent 10K/ 10Q report provided for a company. You have access to a
-    powerful tool that can help you extract relevant information
-    from the 10K. Your analysis should be based solely on the
-    information that you retrieve using this tool. You can interact
-    with this tool using natural language queries. The tool will
-    understand your requests and return relevant text snippets
-    and data points from the 10K/ 10Q document. Keep checking if you
-    have answered the users question to avoid looping.
-    Available tools: {tool_names}
-    Company: {ticker}
+    system_prompt = f"""s a fundamental financial equity
+        analyst your primary responsibility is to analyze the most
+        recent 10K report provided for a company. You have access to a
+        powerful tool that can help you extract relevant information
+        from the 10K. Your analysis should be based solely on the
+        information that you retrieve using this tool. You can interact
+        with this tool using python commands. The tool will
+        will return relevant text snippets
+        and data points from the 10K document. Keep checking if you
+        have answered the users question to avoid looping.
+        You have access to Python REPL tools with pre-loaded SEC filing objects.
+    
 
-    Use the following format:
-    Question: the input question you must answer
-    Thought: you should always think about what to do
-    Action: the action to take, should be one of [{tool_names}]
-    Action Input: the input to the action
-    Observation: the result of the action
-    ... (this Thought/Action/Action Input/Observation can repeat N times)
-    Thought: I now know the final answer
-    Final Answer: the final answer to the original input question"""
+        START by running: print(filing.to_context())
+        Then use methods that are listed to navigate the filing. 
+        DO NOT try to fetch data from SEC.gov URLs - the filing is already loaded.
+
+        Available tools: {tool_names}
+        Company: {ticker}
+
+        Use the ReAct format:
+        Question: the input question you must answer
+        Thought: you should always think about what to do
+        Action: the action to take, should be one of [{tool_names}]
+        Action Input: Python code to execute (e.g., "print(filing.to_context())")
+        Observation: the result of the action
+        ..."""
         
     agent_graph = create_react_agent(
         llm, 

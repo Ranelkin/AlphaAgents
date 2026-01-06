@@ -21,6 +21,7 @@ def create_tenk_filing_repl(ticker: str):
     company = Company(ticker)
     assert company.is_company, f"No company found for {ticker}"
     filing = company.get_filings(form='10-K').latest(1)
+    assert filing 
     restricted_env = {
         "filing": filing,
         "print": print,
@@ -31,18 +32,18 @@ def create_tenk_filing_repl(ticker: str):
         "type": type,       
        
     }  
-
-    description = """This a python shell equiped with the edgar company 10-K Filing.
-    Use this to explore the filing. Start with: print(filing.to_context()).
-    You can use dir(filing), help(filing.obj), etc. to discover available methods."""    
-    
-    _tenk_repl[ticker] = PythonREPL(globals=restricted_env, locals=restricted_env)
-    logger.info('Registered 10K Repl')
+    # Python REPL does not have an __init__ method so one has to set 
+    # the globals after initiation 
+    repl = PythonREPL()
+    repl.globals = restricted_env
+    repl.locals = restricted_env
+    return repl 
     
 def create_tenq_filing_repl(ticker: str): 
     company = Company(ticker)
     assert company.is_company, f"No company found for {ticker}"
     filing = company.get_filings(form='10-Q').latest(1)
+    assert filing 
     restricted_env = {
         "filing": filing,
         "print": print,
@@ -53,13 +54,11 @@ def create_tenq_filing_repl(ticker: str):
         "type": type,       
        
     }  
-    
-    description = """This a python shell equiped with the edgar company 10-Q Filing.
-    Use this to explore the filing. Start with: print(filing.to_context()).
-    You can use dir(filing), help(filing.obj), etc. to discover available methods."""    
-    
-    _tenq_repl[ticker] = PythonREPL(globals=restricted_env, locals=restricted_env)
-    logger.info('Registered 10Q Repl')
+ 
+    repl = PythonREPL()
+    repl.globals = restricted_env
+    repl.locals = restricted_env
+    return repl 
     
 
 def query_tenk_filing(ticker: str, query: str):

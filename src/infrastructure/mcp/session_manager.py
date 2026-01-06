@@ -55,10 +55,12 @@ class Session:
                 result = self.mcp_tool.call_tool(tool_name, call_args)
                 return result
         else:
-            def wrapper(**kwargs):
+            def wrapper(*args, **kwargs):
                 """Dynamically generated wrapper for multi-parameter tool."""
+                call_args = dict(zip(params, args))
+                call_args.update(kwargs)
                 logger.info(f"Calling MCP tool '{tool_name}' with args: {kwargs}")
-                result = self.mcp_tool.call_tool(tool_name, kwargs)
+                result = self.mcp_tool.call_tool(tool_name, call_args)
                 return result
         
         # Preserve metadata
