@@ -46,9 +46,9 @@ def fundamental_agent_node(state: ConversationState) -> ConversationState:
         will return relevant text snippets
         and data points from the 10K document. Keep checking if you
         have answered the users question to avoid looping.
+        After gathering key sections (Business, Risk Factors, MD&A, Financial Statements), stop tool use and provide the full fundamental analysis.
         You have access to Python REPL tools with pre-loaded SEC filing objects.
     
-
         START by running: print(filing.to_context())
         Then use methods that are listed to navigate the filing. 
         DO NOT try to fetch data from SEC.gov URLs - the filing is already loaded.
@@ -89,7 +89,7 @@ def fundamental_agent_node(state: ConversationState) -> ConversationState:
         
         for event in agent_graph.stream(
             {"messages": [{"role": "user", "content": input_text}]},
-            {"recursion_limit": 15},
+            {"recursion_limit": 50},
             stream_mode="values" 
         ):
             logger.info(f"Agent step: {event}")
