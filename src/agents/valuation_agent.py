@@ -53,14 +53,14 @@ def valuation_agent_node(state: ConversationState):
 
     tools = [
         Tool(
-            name="price_data",
+            name = "price_data",
             func = get_price_data,
-            description="""Price data for the stock to analyze, tool doesnt take any input"""
+            description = "Price data for the stock to analyze"
         ),
         Tool(
-            name="volume_data",
+            name = "volume_data",
             func = get_volume_data,
-            description = """Volume data for the stock to analyze, tool doesnt take any input"""
+            description = "Volume data for the stock to analyze"
         )
     ]
 
@@ -78,6 +78,9 @@ def valuation_agent_node(state: ConversationState):
 
             Available tools: {tool_names}
             Company: {ticker}
+            Your final analysis MUST include:
+            - A summary
+            - BUY/SELL recommendation + conviction score (1-10)
         """
 
     agent_graph = create_react_agent(

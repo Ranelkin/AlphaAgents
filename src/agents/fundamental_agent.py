@@ -61,7 +61,7 @@ def fundamental_agent_node(state: ConversationState) -> ConversationState:
         Your final analysis MUST include:
         - Revenue trend (3 years with % growth)
         - Net income and margins
-        - BUY/SELL + conviction score
+        - BUY/SELL + conviction score (1-10)
         ..."""
     
     
