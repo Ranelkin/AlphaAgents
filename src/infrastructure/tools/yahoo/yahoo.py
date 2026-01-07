@@ -14,9 +14,9 @@ def sentiment(ticker: yf.Ticker):
     filtered_news = list(map(lambda x: x.get('content'), news))
     
     df = pd.DataFrame(filtered_news)
-    logger.info(df)
     assert 'title' in df.columns
     scores = df['title'].apply(lambda x: analyzer.polarity_scores(x)['compound'])
+
     return {
         'mean': float(scores.mean()),
         'news': news,
@@ -32,13 +32,14 @@ def trading_data(ticker: yf.Ticker):
     month = ticker.history('1mo')
     mdf = pd.DataFrame(month)
     mdf = mdf[['Open', 'Volume']].reset_index()
-    
     year = ticker.history('1y')
+
     ydf = pd.DataFrame(year)
     ydf = ydf[['Open', 'Volume']].reset_index()
+    
     # Daily price calculation, 5d ensures that latest full day is included 
     range = ticker.history('5d').iloc[-1]
-   
+
     return {
         'price': {
             'Day': day,      #Price data for a day
@@ -62,7 +63,7 @@ def retrieve_yahoo_data(ticker: str):
     td = trading_data(yfTicker)
     price = td['price']
     volume = td['volume']
-    return {
+    data =  {
         'sentiment': {
             'mean': sentiment_data['mean'],
             'news': sentiment_data['news'],
@@ -83,4 +84,7 @@ def retrieve_yahoo_data(ticker: str):
             '1y': volume['1y']
         }
     }
+  
+    return data
+
 

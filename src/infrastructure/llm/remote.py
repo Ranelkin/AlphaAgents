@@ -4,5 +4,5 @@ Currently the only provider in use is OpenAI.
 
 from .providers.openai import llm 
 
-
-remote_llm = llm 
+def remote_llm(): 
+    return llm 
