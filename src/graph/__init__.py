@@ -1,1 +1,1 @@
-from .graph import main_graph 
+from .graph import run_debate 

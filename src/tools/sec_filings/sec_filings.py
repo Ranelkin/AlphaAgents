@@ -1,8 +1,7 @@
 import os 
 from edgar import * 
 from langchain_experimental.utilities import PythonREPL
-from langchain.tools import Tool
-from ....util.log_config import setup_logging
+from src.util import setup_logging
 
 logger = setup_logging('tool.SEC_filings')
 
