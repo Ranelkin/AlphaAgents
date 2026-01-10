@@ -5,10 +5,10 @@ from src.tools import retrieve_yahoo_data
 from src.tools.sec_filings import create_tenk_filing_repl, create_tenq_filing_repl
 from src.util.log_config import setup_logging
 from src.config import llm_config
+from src.tracing import init_phoenix
 
 logger = setup_logging('autogen_agents')
-tracer_provider = register(project_name="AlphaAgents")
-phoenix_session = px.launch_app() #type: ignore
+tracer_provider = init_phoenix()
 
 def create_agents(ticker: str):
     """Create the three specialized agents for a given ticker"""
