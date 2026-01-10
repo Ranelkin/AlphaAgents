@@ -1,17 +1,12 @@
 import streamlit as st
 import atexit
-from src.infrastructure.mcp import shutdown_mcp, get_mcp_manager
 from src.util.log_config import setup_logging
-from src.graph import main_graph
+from src.graph import run_debate, create_agents
+from src.util import extract_ticker
+from .stream import chat_stream
+
 logger = setup_logging('chat.streamlit')
 
-@st.cache_resource
-def init_mcp():
-    manager = get_mcp_manager()
-    logger.info("MCP manager initialized")
-    return manager
-
-# Helper Methods
 
 def extract_clean_text(content):
     """Extract clean text from various message formats"""
@@ -26,7 +21,6 @@ def extract_clean_text(content):
 
 def _shutdown():
     try:
-        shutdown_mcp()
         logger.info("MCP shutdown")
     except Exception as e:
         logger.error(f"Shutdown error: {e}")
@@ -46,11 +40,8 @@ def chat_interface():
             """
         )
         if st.button("End Session"):
-            shutdown_mcp()
             st.success("Session cleaned up")
             st.rerun()
-    #Initialize MCP ressources 
-    init_mcp()
     
     ####################
     # Chat configuration
@@ -67,77 +58,59 @@ def chat_interface():
             st.markdown(prompt)
             
         with st.chat_message("assistant"):
-            answer_ph = st.empty()
-            input_data = {"messages": [{"role": "user", "content": prompt}]}
-            final_answer = ""
-            
-        try:
-            step_container = st.container()
-            
-            step_names = {
-                "mediator": "Initiating round robing conversation",
-                "extract_ticker": "Extracting Ticker",
-                "fetch_data": "Fetching Market Data",
-                "fundamental": "Fundamental Analyst cooking...",
-                "technical": "Technical Analyst cooking...",
-                "mediator": "Final Recommendation",
-                "fetch_reports": "Fetching 10-Q/10-K reports",
-                "market_news": "Fetching market news...",
-                "sector_reports": "Fetching sector research reports..", 
-                "price_targets": "Research other analysts price targets..."
-            }
-          
-            last_state = None
-            
-            for event in main_graph.stream(
-                input_data,
-                stream_mode="updates",
-                config={"recursion_limit": 50},
-            ):
-                for node_name, node_output in event.items():
-                    friendly_name = step_names.get(node_name, f"{node_name}")
-                    
-                    with step_container.expander(friendly_name, expanded=False):
-                        if "messages" in node_output:
-                            msgs = node_output["messages"]
-                            for msg in msgs:
-                                if isinstance(msg, dict):
-                                    role = msg.get("role", "")
-                                    txt = msg.get("content", "")
-                                else:
-                                    role = getattr(msg, "type", "assistant")
-                                    txt = getattr(msg, "content", "")
-                                
-                                clean_txt = extract_clean_text(txt)
-                                if clean_txt and clean_txt.strip():
-                                    st.markdown(clean_txt)
-                    
-                    last_state = node_output
-            
-            if last_state and "messages" in last_state:
-                final_msgs = last_state["messages"]
+            ticker = extract_ticker(prompt)
+            st.write_stream(chat_stream(f'Analyzing the following ticker: {ticker}'))
+            try:
                 
-                for msg in reversed(final_msgs):
-                    if isinstance(msg, dict):
-                        role = msg.get("role", "").lower()
-                        txt = msg.get("content", "")
-                    else:
-                        role = getattr(msg, "type", "").lower()
-                        txt = getattr(msg, "content", "")
+                fund_exp = st.expander("Fundamental Analyst", expanded=True)
+                sent_exp = st.expander("Sentiment Analyst", expanded=True)
+                val_exp = st.expander("Valuation Analyst", expanded=True)
+                debate_exp = st.expander("Debate & Consensus", expanded=True)
+                
+                with st.spinner("Initializing agents..."):
+                    agents = create_agents(ticker)
+                
+                with fund_exp:
+                    st.write_stream(chat_stream("Analyzing 10-K/10-Q filings..."))
                     
-                    if role not in {"user", "human"} and txt:
-                        final_answer = extract_clean_text(txt)
-                        break
-            
-            if final_answer:
-                answer_ph.markdown(final_answer)
-            else:
-                answer_ph.error("No final answer - check the steps above.")
+                with sent_exp:
+                    st.write_stream(chat_stream("Analyzing market sentiment and news..."))
+                    
+                with val_exp:
+                    st.write_stream(chat_stream("Analyzing price trends and valuation..."))
+                
+                with st.spinner(f"Agents debating on {ticker}..."):
+                    result = run_debate(ticker, mode="debate")
+                
+                chat_history = result.chat_history
+                
+                for msg in chat_history:
+                    agent_name = msg.get('name', 'Unknown')
+                    content = msg.get('content', '')
+                    
+                    if 'Fundamental' in agent_name:
+                        with fund_exp:
+                            st.markdown(content)
+                    elif 'Sentiment' in agent_name:
+                        with sent_exp:
+                            st.markdown(content)
+                    elif 'Valuation' in agent_name:
+                        with val_exp:
+                            st.markdown(content)
+                    else:
+                        with debate_exp:
+                            st.markdown(f"**{agent_name}:** {content}")
+                
+                # Final rec
+                final_answer = chat_history[-1].get('content', 'No recommendation')
+                st.success(f"**Final Recommendation:** {final_answer}")
+                
+            except Exception as e:
+                logger.error(f"Error: {e}", exc_info=True)
+                st.error(f"Error analyzing {ticker}: {e}")
         
-        except Exception as e:
-            logger.error(f"Graph error: {e}", exc_info=True)
-            answer_ph.error(f"Error: {e}")
-        
-        final_display = final_answer or "*(no answer)*"
-        st.session_state.messages.append({"role": "assistant", "content": final_display})
-
+        # Session saving 
+        st.session_state.messages.append({
+            "role": "assistant", 
+            "content": final_answer #type: ignore 
+        })

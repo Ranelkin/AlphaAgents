@@ -1,3 +1,5 @@
+import phoenix as px 
+from phoenix.otel import register
 from autogen import AssistantAgent, GroupChat, GroupChatManager
 from src.tools import retrieve_yahoo_data
 from src.tools.sec_filings import create_tenk_filing_repl, create_tenq_filing_repl
@@ -5,12 +7,13 @@ from src.util.log_config import setup_logging
 from src.config import llm_config
 
 logger = setup_logging('autogen_agents')
+tracer_provider = register(project_name="AlphaAgents")
+phoenix_session = px.launch_app() #type: ignore
 
 def create_agents(ticker: str):
     """Create the three specialized agents for a given ticker"""
     
     yahoo_data = retrieve_yahoo_data(ticker)
-    news = yahoo_data['sentiment'].get('news', [])
     fundamental_agent = AssistantAgent(
         name="Fundamental_Analyst",
         system_message=f"""As a fundamental financial equity
