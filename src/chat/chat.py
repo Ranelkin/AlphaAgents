@@ -8,18 +8,6 @@ from .stream import chat_stream
 
 logger = setup_logging('chat.streamlit')
 
-
-def extract_clean_text(content):
-    """Extract clean text from various message formats"""
-    if isinstance(content, str):
-        if "structuredContent=" in content:
-            import re
-            match = re.search(r"'result':\s*'([^']+)'", content)
-            if match:
-                return match.group(1)
-        return content
-    return str(content)
-
 def _shutdown():
     try:
         logger.info("Shutting down application")
@@ -111,7 +99,6 @@ def chat_interface():
                 debate_status = st.empty()
                 debate_status.info(f"🔄 Agents are debating on {ticker}...")
 
-                result = run_debate(ticker, mode="debate")
                 
                 status_fund.empty()
                 status_sent.empty()
@@ -124,12 +111,18 @@ def chat_interface():
                     'Valuation_Analyst': [],
                     'chat_manager': []
                 }
-                chat_history = result.chat_history
-                
-                for msg in chat_history:
-                    agent_name = msg.get('name', 'Unknown')
+                chat_history = []
+                for msg in run_debate(ticker, mode='debate'):
+                    agent_name: str = msg.get('name', 'Unknown')
                     content = msg.get('content', '')
+                    chat_history.append(msg)
                     agent_messages[agent_name].append(content)
+
+                status_fund.empty()
+                status_sent.empty()
+                status_val.empty()
+                debate_status.empty()
+
                 
                 with fund_exp:
                     if agent_messages['Fundamental_Analyst']:
@@ -177,11 +170,12 @@ def chat_interface():
                         st.info("No debate messages recorded")
                 # Final rec
                 final_answer = chat_history[-1].get('content', 'No recommendation')
-                st.success(f"**Final Recommendation:** {final_answer}")
+                st.success(f"**Final Recommendation:** {final_answer}") #type
                 
             except Exception as e:
                 logger.error(f"Error: {e}", exc_info=True)
                 st.error(f"Error analyzing {ticker}: {e}")
+                final_answer = f"Error: {str(e)}"
         
         # Session saving 
         st.session_state.messages.append({

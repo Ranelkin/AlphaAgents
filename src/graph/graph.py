@@ -91,7 +91,7 @@ def run_debate(ticker: str, mode: str = "debate"):
         groupchat = GroupChat(
             agents=agents, # type: ignore
             messages=[],
-            max_round=6,  # 3 agents * 2 rounds
+            max_round=10,  
             speaker_selection_method="round_robin",
             allow_repeat_speaker=False
         ) 
@@ -111,7 +111,7 @@ def run_debate(ticker: str, mode: str = "debate"):
         groupchat = GroupChat(
             agents=agents, # type: ignore
             messages=[],
-            max_round=4, 
+            max_round=10, 
             speaker_selection_method="round_robin"
         )
         
@@ -125,12 +125,27 @@ def run_debate(ticker: str, mode: str = "debate"):
             Reply "TERMINATE" at the end when everything is done."""
         )
 
-    # Concersation start     
+    user_proxy = agents[0]
+    # Conversation start     
     initial_message = f"Analyze {ticker} stock. Each analyst provide your recommendation."
+    groupchat.messages.append({"role": "user", "name": user_proxy.name, "content": initial_message})
+    #Yield init message 
+    yield {"name": user_proxy.name, "content": initial_message}
     
-    result = agents[0].initiate_chat(
-        manager,
-        message=initial_message
-    )
+    speaker = groupchat.agents[0]
+    i = 0
+    while i < groupchat.max_round:
+        try:
+            speaker = groupchat.select_speaker(last_speaker=speaker, selector=manager)
+        except Exception as e:
+            logger.warning(f"Speaker selection failed: {e}")
+            break
+        reply: str = speaker.generate_reply(messages=groupchat.messages, sender=manager)
+        if reply is None:
+            break
+        groupchat.messages.append({"role": "assistant", "name": speaker.name, "content": reply})
+        yield {"name": speaker.name, "content": reply}
+        if "TERMINATE" in reply.upper():
+            break
+        i += 1
     
-    return result
