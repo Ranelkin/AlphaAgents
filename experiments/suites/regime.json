@@ -1,0 +1,15 @@
+{
+  "_description": "Regime comparison; run once for each pre-frozen window below.",
+  "risk_free_rate_annual": 0.053,
+  "_windows": [
+    { "label": "bull_2024H1",    "information_cutoff_date": "2024-01-31", "portfolio_start_date": "2024-02-01", "portfolio_end_date": "2024-05-31", "regime": "tech bull rally" },
+    { "label": "bear_2022H1",    "information_cutoff_date": "2022-01-31", "portfolio_start_date": "2022-02-01", "portfolio_end_date": "2022-05-31", "regime": "tech bear / rate shock" },
+    { "label": "sideways_2023Q2","information_cutoff_date": "2023-03-31", "portfolio_start_date": "2023-04-01", "portfolio_end_date": "2023-07-31", "regime": "range-bound" },
+    { "label": "highvol_2020H1", "information_cutoff_date": "2020-01-31", "portfolio_start_date": "2020-02-01", "portfolio_end_date": "2020-05-31", "regime": "COVID shock / V-recovery" }
+  ],
+  "runs": [
+    { "label": "debate_neutral",      "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo", "provider": "together", "workflow_mode": "debate",       "risk_profile": "risk_neutral", "tooling_mode": "paper_like" },
+    { "label": "debate_averse",       "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo", "provider": "together", "workflow_mode": "debate",       "risk_profile": "risk_averse",  "tooling_mode": "paper_like" },
+    { "label": "single_neutral",      "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo", "provider": "together", "workflow_mode": "single_agent", "risk_profile": "risk_neutral", "tooling_mode": "paper_like" }
+  ]
+}

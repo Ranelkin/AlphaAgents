@@ -1,0 +1,8 @@
+{
+  "_description": "Seeded-random and equal-weight buy baselines.",
+  "risk_free_rate_annual": 0.053,
+  "runs": [
+    { "label": "baseline_random", "model": "none", "provider": "none", "workflow_mode": "baseline_random" },
+    { "label": "baseline_buy",    "model": "none", "provider": "none", "workflow_mode": "baseline_buy" }
+  ]
+}

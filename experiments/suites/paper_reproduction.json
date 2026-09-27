@@ -1,0 +1,47 @@
+{
+  "_description": "Main reproduction matrix for the February-May 2024 window.",
+  "_universe_note": "AAPL MSFT NVDA GOOG META AMZN TSLA AVGO ORCL CRM AMD QCOM TXN MU INTC",
+  "risk_free_rate_annual": 0.053,
+  "runs": [
+    {
+      "label": "debate_risk_neutral_paper_like",
+      "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo",
+      "provider": "together",
+      "workflow_mode": "debate",
+      "risk_profile": "risk_neutral",
+      "tooling_mode": "paper_like"
+    },
+    {
+      "label": "debate_risk_averse_paper_like",
+      "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo",
+      "provider": "together",
+      "workflow_mode": "debate",
+      "risk_profile": "risk_averse",
+      "tooling_mode": "paper_like"
+    },
+    {
+      "label": "single_fundamental_risk_neutral",
+      "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo",
+      "provider": "together",
+      "workflow_mode": "single_agent",
+      "risk_profile": "risk_neutral",
+      "tooling_mode": "paper_like"
+    },
+    {
+      "label": "single_fundamental_risk_averse",
+      "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo",
+      "provider": "together",
+      "workflow_mode": "single_agent",
+      "risk_profile": "risk_averse",
+      "tooling_mode": "paper_like"
+    },
+    {
+      "label": "debate_risk_seeking_null_check",
+      "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo",
+      "provider": "together",
+      "workflow_mode": "debate",
+      "risk_profile": "risk_seeking",
+      "tooling_mode": "paper_like"
+    }
+  ]
+}

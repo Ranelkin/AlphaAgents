@@ -1,0 +1,11 @@
+{
+  "_description": "Repeated headline workflows and non-LLM baselines.",
+  "risk_free_rate_annual": 0.053,
+  "runs": [
+    { "label": "single_neutral",  "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo", "provider": "together", "workflow_mode": "single_agent",  "risk_profile": "risk_neutral", "tooling_mode": "paper_like" },
+    { "label": "collab_neutral",  "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo", "provider": "together", "workflow_mode": "collaboration", "risk_profile": "risk_neutral", "tooling_mode": "paper_like" },
+    { "label": "debate_neutral",  "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo", "provider": "together", "workflow_mode": "debate",        "risk_profile": "risk_neutral", "tooling_mode": "paper_like" },
+    { "label": "baseline_random", "model": "none", "provider": "none", "workflow_mode": "baseline_random" },
+    { "label": "baseline_buy",    "model": "none", "provider": "none", "workflow_mode": "baseline_buy" }
+  ]
+}

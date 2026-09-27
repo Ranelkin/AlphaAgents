@@ -1,0 +1,14 @@
+{
+  "_description": "Repeated neutral-debate configuration for variance estimates.",
+  "risk_free_rate_annual": 0.053,
+  "runs": [
+    {
+      "label": "debate_risk_neutral_paper_like",
+      "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo",
+      "provider": "together",
+      "workflow_mode": "debate",
+      "risk_profile": "risk_neutral",
+      "tooling_mode": "paper_like"
+    }
+  ]
+}

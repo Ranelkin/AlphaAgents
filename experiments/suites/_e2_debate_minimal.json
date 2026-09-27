@@ -1,0 +1,7 @@
+{
+  "_description": "Minimal-tooling debate rerun for E2.",
+  "risk_free_rate_annual": 0.053,
+  "runs": [
+    { "label": "debate_minimal", "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo", "provider": "together", "workflow_mode": "debate", "tooling_mode": "minimal" }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "_description": "Workflow and tooling ablation on a shared manifest.",
+  "risk_free_rate_annual": 0.053,
+  "runs": [
+    { "label": "single_paper_like",    "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo", "provider": "together", "workflow_mode": "single_agent",  "tooling_mode": "paper_like" },
+    { "label": "single_no_rag",        "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo", "provider": "together", "workflow_mode": "single_agent",  "tooling_mode": "no_rag" },
+    { "label": "single_no_news",       "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo", "provider": "together", "workflow_mode": "single_agent",  "tooling_mode": "no_news" },
+    { "label": "single_minimal",       "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo", "provider": "together", "workflow_mode": "single_agent",  "tooling_mode": "minimal" },
+
+    { "label": "collab_paper_like",    "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo", "provider": "together", "workflow_mode": "collaboration", "tooling_mode": "paper_like" },
+    { "label": "collab_no_rag",        "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo", "provider": "together", "workflow_mode": "collaboration", "tooling_mode": "no_rag" },
+    { "label": "collab_no_news",       "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo", "provider": "together", "workflow_mode": "collaboration", "tooling_mode": "no_news" },
+    { "label": "collab_minimal",       "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo", "provider": "together", "workflow_mode": "collaboration", "tooling_mode": "minimal" },
+
+    { "label": "debate_paper_like",    "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo", "provider": "together", "workflow_mode": "debate",        "tooling_mode": "paper_like" },
+    { "label": "debate_no_rag",        "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo", "provider": "together", "workflow_mode": "debate",        "tooling_mode": "no_rag" },
+    { "label": "debate_no_news",       "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo", "provider": "together", "workflow_mode": "debate",        "tooling_mode": "no_news" },
+    { "label": "debate_minimal",       "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo", "provider": "together", "workflow_mode": "debate",        "tooling_mode": "minimal" }
+  ]
+}

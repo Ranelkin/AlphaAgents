@@ -1,0 +1,22 @@
+{
+  "_description": "Small end-to-end validation suite.",
+  "risk_free_rate_annual": 0.053,
+  "runs": [
+    {
+      "label": "smoke_single_neutral",
+      "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo",
+      "provider": "together",
+      "workflow_mode": "single_agent",
+      "risk_profile": "risk_neutral",
+      "tooling_mode": "paper_like"
+    },
+    {
+      "label": "smoke_debate_neutral",
+      "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo",
+      "provider": "together",
+      "workflow_mode": "debate",
+      "risk_profile": "risk_neutral",
+      "tooling_mode": "paper_like"
+    }
+  ]
+}

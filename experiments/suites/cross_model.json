@@ -1,0 +1,13 @@
+{
+  "_description": "Model comparison with the workflow and data held constant.",
+  "risk_free_rate_annual": 0.053,
+  "runs": [
+    { "label": "llama_3_3_70b",     "model": "meta-llama/Llama-3.3-70B-Instruct-Turbo",  "provider": "together", "workflow_mode": "debate", "risk_profile": "risk_neutral", "tooling_mode": "paper_like" },
+    { "label": "gpt_oss_20b",       "model": "openai/gpt-oss-20b",                       "provider": "together", "workflow_mode": "debate", "risk_profile": "risk_neutral", "tooling_mode": "paper_like" },
+    { "label": "gpt_oss_120b",      "model": "openai/gpt-oss-120b",                      "provider": "together", "workflow_mode": "debate", "risk_profile": "risk_neutral", "tooling_mode": "paper_like" },
+    { "label": "qwen3_235b_2507",   "model": "Qwen/Qwen3-235B-A22B-Instruct-2507-tput",  "provider": "together", "workflow_mode": "debate", "risk_profile": "risk_neutral", "tooling_mode": "paper_like" },
+    { "label": "deepseek_v4_pro",   "model": "deepseek-ai/DeepSeek-V4-Pro",              "provider": "together", "workflow_mode": "debate", "risk_profile": "risk_neutral", "tooling_mode": "paper_like" },
+    { "label": "glm_5_2",           "model": "zai-org/GLM-5.2",                          "provider": "together", "workflow_mode": "debate", "risk_profile": "risk_neutral", "tooling_mode": "paper_like" },
+    { "label": "gemma_4_31b",       "model": "google/gemma-4-31B-it",                    "provider": "together", "workflow_mode": "debate", "risk_profile": "risk_neutral", "tooling_mode": "paper_like" }
+  ]
+}
